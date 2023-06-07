@@ -32,7 +32,15 @@ Vite Vue Bpmn流程编辑器，基于[Bpmn.js](https://github.com/bpmn-io/bpmn-j
 
 实现了 Bpmn.js 和 Diagram.js 的 typescript 类型声明，typescript 可以用来在编辑器中编写代码。
 
+React 项目也可以参考自定义插件和属性更新方式。
+
 > 码云：https://gitee.com/MiyueSC/vite-vue-bpmn-process
+
+> 🚀Tips:
+> 
+> Diagram.js 最近已经实现了 Type Declares 声明，具体请查看 [Diagram.js](https://github.com/bpmn-io/diagram-js) 的 **type-declarations** 分支~
+> 
+> Bpmn.js 的 Type Declares 声明 目前已经加入到 bpmn-io 团队的任务面板中，但目前处于 **积压状态**。
 
 ## 友情赞助
 
@@ -46,6 +54,10 @@ Vite Vue Bpmn流程编辑器，基于[Bpmn.js](https://github.com/bpmn-io/bpmn-j
 > 付费咨询联系微信：
 > 
 > <img alt="wechat.png" src="public/wechat.png" width="200"/>
+> 
+> 也可关注公众号：MiyueFE 的前端圈
+>
+> <img alt="wechat.png" src="public/qrcode.jpg" width="200"/>
 
 ## 结构目录
 

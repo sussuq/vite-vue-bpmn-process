@@ -1,6 +1,6 @@
-import { Ref, toRaw } from 'vue'
-import { ModuleDeclaration } from 'didi'
-import { EditorSettings } from 'types/editor/settings'
+import { type Ref, toRaw } from 'vue'
+import type { ModuleDeclaration } from 'didi'
+import type { EditorSettings } from 'types/editor/settings'
 
 // ** 官方流程模拟 module
 import TokenSimulationModule from 'bpmn-js-token-simulation'
@@ -15,16 +15,16 @@ import MiyueModdleDescriptors from '@/moddle-extensions/miyue.json'
 import {
   BpmnPropertiesPanelModule,
   BpmnPropertiesProviderModule,
-  CloudElementTemplatesPropertiesProviderModule,
   CamundaPlatformPropertiesProviderModule
 } from 'bpmn-js-properties-panel'
-import CamundaExtensionModule from 'camunda-bpmn-moddle/lib'
+
+import CamundaExtensionModule from 'camunda-bpmn-moddle/resources/camunda.json'
 
 // 官方扩展工具 元素模板选择
-import ElementTemplateChooserModule from '@bpmn-io/element-template-chooser'
-import ConnectorsExtensionModule from 'bpmn-js-connectors-extension'
+// import ElementTemplateChooserModule from '@bpmn-io/element-template-chooser'
+// import ConnectorsExtensionModule from 'bpmn-js-connectors-extension'
 
-import Grid from 'diagram-js/lib/features/grid-snapping/visuals'
+// import Grid from 'diagram-js/lib/features/grid-snapping/visuals'
 
 // 自定义 modules 扩展模块
 import translate from '@/additional-modules/Translate'
@@ -45,10 +45,18 @@ import bpmnlint from '@/additional-modules/Lint/bpmnlint'
 // 小地图
 import minimapModule from 'diagram-js-minimap'
 
-export default function (settings: Ref<EditorSettings>) {
+import BpmnColorPickerModule from 'bpmn-js-color-picker'
+
+export type ModulesAndModdles = [
+  ModuleDeclaration[],
+  { [key: string]: any },
+  { [key: string]: unknown }
+]
+
+export default function (settings: Ref<EditorSettings>): ModulesAndModdles {
   const modules: ModuleDeclaration[] = [] // modules 扩展模块数组
   let moddle: { [key: string]: any } = {} // moddle 声明文件对象
-  const options: { [key: string]: any } = {} // modeler 其他配置
+  const options: { [key: string]: unknown } = {} // modeler 其他配置
 
   // 配置 palette (可覆盖 paletteProvider 取消原生侧边栏)
   settings.value.paletteMode === 'enhancement' && modules.push(EnhancementPalette)
@@ -80,20 +88,20 @@ export default function (settings: Ref<EditorSettings>) {
       options['propertiesPanel'] = { parent: '#camunda-penal' }
       moddle['camunda'] = camundaModdleDescriptors
     }
-    if (settings.value.templateChooser) {
-      modules.push(
-        CloudElementTemplatesPropertiesProviderModule,
-        ElementTemplateChooserModule,
-        ConnectorsExtensionModule
-      )
-      options['exporter'] = {
-        name: 'element-template-chooser',
-        version: '0.0.1'
-      }
-      options['connectorsExtension'] = {
-        appendAnything: true
-      }
-    }
+    // if (settings.value.templateChooser) {
+    //   modules.push(
+    //     CloudElementTemplatesPropertiesProviderModule,
+    //     ElementTemplateChooserModule,
+    //     ConnectorsExtensionModule
+    //   )
+    //   options['exporter'] = {
+    //     name: 'element-template-chooser',
+    //     version: '0.0.1'
+    //   }
+    //   options['connectorsExtension'] = {
+    //     appendAnything: true
+    //   }
+    // }
   }
 
   // 设置 lint 校验
@@ -114,9 +122,9 @@ export default function (settings: Ref<EditorSettings>) {
   }
 
   // 官方网点背景
-  if (settings.value.bg === 'grid') {
-    modules.push(Grid)
-  }
+  // if (settings.value.bg === 'grid') {
+  //   modules.push(Grid)
+  // }
 
   // 设置其他模块的启用
   if (settings.value.otherModule) {
@@ -126,6 +134,8 @@ export default function (settings: Ref<EditorSettings>) {
     modules.push(AutoPlace)
 
     modules.push(TokenSimulationModule)
+
+    modules.push(BpmnColorPickerModule)
 
     // 设置键盘事件绑定
     options['keyboard'] = {

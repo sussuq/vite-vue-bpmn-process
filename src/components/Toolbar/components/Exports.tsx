@@ -2,11 +2,13 @@ import { defineComponent } from 'vue'
 import { NButton, NPopover } from 'naive-ui'
 import { downloadFile, setEncoded } from '@/utils/files'
 import modeler from '@/store/modeler'
+import { useI18n } from 'vue-i18n'
 
 const Exports = defineComponent({
-  name: 'Exports',
+  name: 'ExportTools',
   setup() {
-    const moderlerStore = modeler()
+    const { t } = useI18n()
+    const modelerStore = modeler()
     // 下载流程图到本地
     /**
      * @param {string} type
@@ -14,22 +16,19 @@ const Exports = defineComponent({
      */
     const downloadProcess = async (type: string, name = 'diagram') => {
       try {
-        const modeler = moderlerStore.getModeler
+        const modeler = modelerStore.getModeler
         // 按需要类型创建文件并下载
         if (type === 'xml' || type === 'bpmn') {
-          const { err, xml } = await modeler!.saveXML()
+          const { error, xml } = await modeler!.saveXML({})
           // 读取异常时抛出异常
-          if (err) {
-            console.error(`[Process Designer Warn ]: ${err.message || err}`)
+          if (error) {
+            console.error(`[Process Designer Warn ]: ${error.message || error}`)
           }
           const { href, filename } = setEncoded(type.toUpperCase(), name, xml!)
           downloadFile(href, filename)
         } else {
-          const { err, svg } = await modeler!.saveSVG()
+          const { svg } = await modeler!.saveSVG()
           // 读取异常时抛出异常
-          if (err) {
-            return console.error(err)
-          }
           const { href, filename } = setEncoded('SVG', name, svg!)
           downloadFile(href, filename)
         }
@@ -53,19 +52,19 @@ const Exports = defineComponent({
         v-slots={{
           trigger: () => (
             <NButton type="info" secondary>
-              导出为...
+              {t('toolbar.exportAs')}
             </NButton>
           ),
           default: () => (
             <div class="button-list_column">
               <NButton type="info" onClick={downloadProcessAsBpmn}>
-                导出为Bpmn
+                {t('toolbar.exportAsBPMN')}
               </NButton>
               <NButton type="info" onClick={downloadProcessAsXml}>
-                导出为XML
+                {t('toolbar.exportAsXML')}
               </NButton>
               <NButton type="info" onClick={downloadProcessAsSvg}>
-                导出为SVG
+                {t('toolbar.exportAsSVG')}
               </NButton>
             </div>
           )

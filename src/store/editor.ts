@@ -9,12 +9,16 @@ const state = {
 export default defineStore('editor', {
   state: () => state,
   getters: {
-    getProcessDef: (state) => ({
+    getLocales: (state): EditorSettings['language'] => state.editorSettings.language,
+    getProcessDef: (state): Pick<EditorSettings, 'processName' | 'processId'> => ({
       processName: state.editorSettings.processName,
       processId: state.editorSettings.processId
     }),
-    getProcessEngine: (state) => state.editorSettings.processEngine,
-    getEditorConfig: (state) => ({
+    getProcessEngine: (state): EditorSettings['processEngine'] =>
+      state.editorSettings.processEngine,
+    getEditorConfig: (
+      state
+    ): Omit<EditorSettings, 'language' | 'processName' | 'processId' | 'processEngine'> => ({
       bg: state.editorSettings.bg,
       paletteMode: state.editorSettings.paletteMode,
       penalMode: state.editorSettings.penalMode,
@@ -32,7 +36,12 @@ export default defineStore('editor', {
   },
   actions: {
     updateConfiguration(conf: Partial<EditorSettings>) {
+      sessionStorage.setItem('lang', <string>conf.language)
       this.$state.editorSettings = { ...this.$state.editorSettings, ...conf }
+    },
+    updateLanguage(lang: string) {
+      sessionStorage.setItem('lang', lang)
+      this.$state.editorSettings.language = lang || 'zh_CN'
     }
   }
 })

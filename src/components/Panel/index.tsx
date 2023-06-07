@@ -15,7 +15,7 @@ import BpmnIcon from '@/components/common/BpmnIcon.vue'
 import { isAsynchronous } from '@/bo-utils/asynchronousContinuationsUtil'
 import { isExecutable } from '@/bo-utils/executionListenersUtil'
 import { isJobExecutable } from '@/bo-utils/jobExecutionUtil'
-import { isStartInitializable } from '@/bo-utils/initiatorUtil'
+import { isStartInitializable, isUserAssignmentSupported } from '@/bo-utils/initiatorUtil'
 
 import ElementGenerations from './components/ElementGenerations.vue'
 import ElementConditional from './components/ElementConditional.vue'
@@ -25,11 +25,14 @@ import ElementExtensionProperties from './components/ElementExtensionProperties.
 import ElementAsyncContinuations from './components/ElementAsyncContinuations.vue'
 import ElementJobExecution from './components/ElementJobExecution.vue'
 import ElementStartInitiator from './components/ElementStartInitiator.vue'
+
+import UserAssignment from './components/UserAssignment.vue'
+
 import { isCanbeConditional } from '@/bo-utils/conditionUtil'
 import { customTranslate } from '@/additional-modules/Translate'
 
 const Panel = defineComponent({
-  name: 'Panel',
+  name: 'PropertiesPanel',
   setup() {
     const modeler = modelerStore()
     const panel = ref<HTMLDivElement | null>(null)
@@ -42,7 +45,7 @@ const Panel = defineComponent({
 
     const renderComponents = markRaw<Component[]>([])
 
-    const setCurrentComponents = (element: Base) => {
+    const setCurrentComponents = (element: BpmnElement) => {
       // 清空
       renderComponents.splice(0, renderComponents.length)
       renderComponents.push(ElementGenerations)
@@ -53,11 +56,12 @@ const Panel = defineComponent({
       isExecutable(element) && renderComponents.push(ElementExecutionListeners)
       isAsynchronous(element) && renderComponents.push(ElementAsyncContinuations)
       isStartInitializable(element) && renderComponents.push(ElementStartInitiator)
+      isUserAssignmentSupported(element) && renderComponents.push(UserAssignment)
     }
 
     // 设置选中元素，更新 store
     const setCurrentElement = debounce((element: Shape | Base | Connection | Label | null) => {
-      let activatedElement: BpmnElement | null | undefined = element
+      let activatedElement: BpmnElement | undefined = element
       let activatedElementTypeName = ''
 
       if (!activatedElement) {
@@ -71,7 +75,7 @@ const Panel = defineComponent({
       }
       activatedElementTypeName = getBpmnIconType(activatedElement)
 
-      modeler.setElement(markRaw(activatedElement), activatedElement.id)
+      modeler.setElement(markRaw(activatedElement))
       currentElementId.value = activatedElement.id
       currentElementType.value = activatedElement.type.split(':')[1]
 
@@ -86,7 +90,6 @@ const Panel = defineComponent({
         'Selected element changed',
         `ID: ${activatedElement.id} , type: ${activatedElement.type}`
       )
-      Logger.prettyInfo('Selected element businessObject', activatedElement.businessObject)
     }, 100)
 
     EventEmitter.on('modeler-init', (modeler) => {
@@ -110,7 +113,7 @@ const Panel = defineComponent({
       })
     })
 
-    onMounted(() => !currentElementId.value && setCurrentElement())
+    onMounted(() => !currentElementId.value && setCurrentElement(null))
 
     return () => (
       <div ref={panel} class="panel">
